@@ -241,7 +241,7 @@ function Home() {
           ) : (
             <div className="max-w-4xl mx-auto w-full">
               <AnimatePresence>
-                {activeChat.messages.map((msg, i) => (
+                {activeChat?.messages?.map((msg, i) => (
                   <Message key={i} {...msg} />
                 ))}
               </AnimatePresence>
