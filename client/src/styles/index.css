@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #0a0a0b;
+  --bg-secondary: #141416;
+  --bg-accent: #1e1e22;
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --accent-blue: #3b82f6;
+  --accent-purple: #8b5cf6;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans antialiased;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-[var(--glass-bg)] border border-[var(--glass-border)] backdrop-blur-md rounded-2xl;
+  }
+
+  .glass-input {
+    @apply bg-transparent border border-[var(--glass-border)] focus:border-[var(--accent-blue)] focus:ring-1 focus:ring-[var(--accent-blue)] outline-none transition-all duration-200 rounded-xl px-4 py-2;
+  }
+
+  .primary-btn {
+    @apply bg-gradient-to-r from-[var(--accent-blue)] to-[var(--accent-purple)] text-white font-medium rounded-xl px-6 py-2 hover:opacity-90 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--bg-accent)] transition-colors text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer;
+  }
+
+  .sidebar-item.active {
+    @apply bg-[var(--bg-accent)] text-[var(--text-primary)];
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Markdown Styles */
+.prose {
+  @apply text-[var(--text-primary)] leading-relaxed;
+}
+
+.prose code {
+  @apply bg-[var(--bg-accent)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--accent-blue)];
+}
+
+.prose pre {
+  @apply bg-[#0d1117] rounded-xl my-4 overflow-hidden border border-[var(--glass-border)];
+}
+
+.prose blockquote {
+  @apply border-l-4 border-[var(--accent-blue)] pl-4 italic text-[var(--text-secondary)];
+}
+
+.prose p {
+  @apply mb-4;
+}
+
+.prose ul,
+.prose ol {
+  @apply mb-4 pl-6;
+}
+
+.prose li {
+  @apply mb-1;
+}
