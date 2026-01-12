@@ -7,7 +7,7 @@ import { streamChat } from "../lib/api";
 import { Send, Sparkles, ChevronDown, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-function App() {
+function Home() {
   const [session, setSession] = useState(null);
   const [chats, setChats] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
@@ -290,4 +290,4 @@ function App() {
   );
 }
 
-export default App;
+export default Home;
