@@ -1,5 +1,6 @@
 export const streamChat = async (messages, model, onChunk) => {
-  const response = await fetch("http://localhost:3000/chat", {
+  const backendURL = import.meta.env.VITE_SUPABASE_URL;
+  const response = await fetch(`${backendURL}/chat`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

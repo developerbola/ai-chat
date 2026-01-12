@@ -47,7 +47,7 @@ export const Auth = () => {
             access_type: "offline",
             prompt: "consent",
           },
-          redirectTo: window.location.origin,
+          redirectTo: "chatt-aii.vercel.app",
           skipBrowserRedirect: true,
         },
       });
