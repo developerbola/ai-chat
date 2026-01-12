@@ -1,9 +1,9 @@
 import "dotenv/config";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { serve } from "@hono/node-server";
 import { streamText } from "hono/streaming";
 import Cerebras from "@cerebras/cerebras_cloud_sdk";
+import { handle } from "hono/vercel";
 
 const app = new Hono();
 const client = new Cerebras({
@@ -40,9 +40,11 @@ app.post("/chat", async (c) => {
   });
 });
 
-const port = 3000;
+const handler = handle(app);
 
-serve({
-  fetch: app.fetch,
-  port,
-});
+export const GET = handler;
+export const POST = handler;
+export const PATCH = handler;
+export const PUT = handler;
+export const OPTIONS = handler;
+export const DELETE = handler;
