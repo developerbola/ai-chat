@@ -1,20 +1,23 @@
 import { useState, useEffect, useRef } from "react";
 import { Sidebar } from "../components/Sidebar";
+import { Textarea } from "../components/ui/textarea";
+import { Button } from "../components/ui/button";
 import { Message } from "../components/Message";
 import { Auth } from "../components/Auth";
 import { supabase } from "../lib/supabase";
 import { streamChat } from "../lib/api";
-import { Send, Sparkles, ChevronDown, LogOut } from "lucide-react";
+import { LogOut, ArrowUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "../lib/utils";
 
 function Home() {
-  const [session, setSession] = useState(null);
-  const [chats, setChats] = useState([]);
-  const [activeChatId, setActiveChatId] = useState(null);
+  const [session, setSession] = useState<any>(null);
+  const [chats, setChats] = useState<any[]>([]);
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [model, setModel] = useState("llama-3.3-70b");
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -78,9 +81,9 @@ function Home() {
     setActiveChatId(newChat.id);
   };
 
-  const handleSelectChat = (id) => setActiveChatId(id);
+  const handleSelectChat = (id: string) => setActiveChatId(id);
 
-  const handleDeleteChat = (id) => {
+  const handleDeleteChat = (id: string) => {
     const filtered = chats.filter((c) => c.id !== id);
     if (filtered.length === 0) {
       const defaultChat = { id: "1", title: "New Chat", messages: [] };
@@ -92,25 +95,44 @@ function Home() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
     const userMessage = { role: "user", content: input };
-    const updatedMessages = [...activeChat.messages, userMessage];
+    let currentChatId = activeChatId;
+    let updatedMessages: any[];
 
-    // Update chat with user message and set title if it's the first message
-    const updatedChats = chats.map((c) =>
-      c.id === activeChatId
-        ? {
-            ...c,
-            messages: updatedMessages,
-            title:
-              c.messages.length === 0 ? input.slice(0, 30) + "..." : c.title,
-          }
-        : c
-    );
-    setChats(updatedChats);
+    if (!activeChat) {
+      const newChatId = Date.now().toString();
+      updatedMessages = [userMessage];
+      const newChat = {
+        id: newChatId,
+        title: input.slice(0, 30) + "...",
+        messages: updatedMessages,
+      };
+      setChats([newChat, ...chats]);
+      setActiveChatId(newChatId);
+      currentChatId = newChatId;
+    } else {
+      currentChatId = activeChatId!;
+      updatedMessages = [...activeChat.messages, userMessage];
+      setChats((prev) =>
+        prev.map((c) =>
+          c.id === currentChatId
+            ? {
+                ...c,
+                messages: updatedMessages,
+                title:
+                  c.messages.length === 0
+                    ? input.slice(0, 30) + "..."
+                    : c.title,
+              }
+            : c
+        )
+      );
+    }
+
     setInput("");
     setIsLoading(true);
 
@@ -121,7 +143,7 @@ function Home() {
       // Add empty assistant message to show it's "typing"
       setChats((prev) =>
         prev.map((c) =>
-          c.id === activeChatId
+          c.id === currentChatId
             ? { ...c, messages: [...updatedMessages, assistantMessage] }
             : c
         )
@@ -131,7 +153,7 @@ function Home() {
         assistantContent += chunk;
         setChats((prev) =>
           prev.map((c) =>
-            c.id === activeChatId
+            c.id === currentChatId
               ? {
                   ...c,
                   messages: [
@@ -164,36 +186,24 @@ function Home() {
         onDeleteChat={handleDeleteChat}
       />
 
-      <main className="flex-1 flex flex-col relative bg-(--bg-primary)">
-        {/* Header */}
-        <header className="h-16 border-b flex items-center justify-between px-8 bg-(--bg-primary)/80 backdrop-blur-md z-10">
+      <main className="flex-1 flex flex-col relative">
+        <header className="h-16 border-b flex items-center justify-between px-8 z-10">
           <div className="flex items-center gap-3">
-            <Sparkles className="text-(--accent-blue)" size={20} />
-            <span className="font-semibold text-lg">
-              Chat AI
-            </span>
+            <span className="font-semibold text-lg">Chat AI</span>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-(--bg-accent) px-3 py-1.5 rounded-lg border text-sm cursor-pointer hover:border-(--accent-blue) transition-all">
-              <span className="text-(--text-secondary)">Model:</span>
-              <span className="font-medium text-(--accent-blue)">{model}</span>
-              <ChevronDown size={14} className="text-(--text-secondary)" />
-            </div>
-
-            <div className="h-8 w-px" />
-
             <div className="flex items-center gap-3">
               <div className="flex flex-col items-end mr-1">
-                <span className="text-[10px] text-(--text-secondary) font-bold uppercase tracking-tighter">
+                <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-tighter">
                   Signed In As
                 </span>
-                <span className="text-xs font-medium text-(--text-primary)">
-                  {session.user.email}
+                <span className="text-xs font-medium text-primary">
+                  {session?.user?.user_metadata?.name}
                 </span>
               </div>
               <button
                 onClick={handleSignOut}
-                className="p-2 rounded-lg bg-(--bg-accent) border text-(--text-secondary) hover:text-red-400 hover:border-red-400/50 transition-all"
+                className="p-2 rounded-lg bg-accent border text-secondary hover:text-red-400 hover:border-red-400/50 transition-all"
                 title="Sign Out"
               >
                 <LogOut size={18} />
@@ -206,42 +216,14 @@ function Home() {
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           {activeChat?.messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center p-8 text-center">
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="w-20 h-20 bg-linear-to-br from-(--accent-blue) to-(--accent-purple) rounded-3xl flex items-center justify-center mb-6 shadow-2xl shadow-blue-500/20"
-              >
-                <Sparkles size={40} className="text-white" />
-              </motion.div>
-              <h2 className="text-3xl font-bold mb-3 tracking-tight">
+              <h2 className="text-3xl font-medium mb-3 tracking-tight">
                 How can I help you today?
               </h2>
-              <p className="text-(--text-secondary) max-w-md">
-                Experience the power of Cerebras with ultra-fast inference and
-                intelligent responses.
-              </p>
-
-              <div className="grid grid-cols-2 gap-4 mt-12 w-full max-w-2xl">
-                {[
-                  "Explain quantum computing",
-                  "Write a React hook for API calls",
-                  "Plan a 3-day trip to Tokyo",
-                  "Write a poem about neon rain",
-                ].map((prompt) => (
-                  <button
-                    key={prompt}
-                    onClick={() => setInput(prompt)}
-                    className="p-4 text-left hover:bg-(--bg-accent) hover:-translate-y-1 transition-all duration-300"
-                  >
-                    <p className="text-sm font-medium">{prompt}</p>
-                  </button>
-                ))}
-              </div>
             </div>
           ) : (
-            <div className="max-w-4xl mx-auto w-full">
+            <div className="max-w-4xl mx-auto w-full pt-5">
               <AnimatePresence>
-                {activeChat?.messages?.map((msg, i) => (
+                {activeChat?.messages?.map((msg: any, i: number) => (
                   <Message key={i} {...msg} />
                 ))}
               </AnimatePresence>
@@ -251,14 +233,13 @@ function Home() {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 md:p-8 relative">
-          <div className="max-w-4xl mx-auto relative group">
-            <div className="absolute -inset-1 bg-linear-to-r from-(--accent-blue) to-(--accent-purple) rounded-2xl opacity-20 group-focus-within:opacity-40 transition-opacity blur-sm" />
+        <div className="w-full max-w-3xl mx-auto px-4 pb-6 pt-2">
+          <div className="relative">
             <form
               onSubmit={handleSubmit}
-              className="relative bg-(--bg-secondary) flex items-end gap-2 p-2"
+              className="relative flex items-end w-full bg-(--bg-secondary)/40 backdrop-blur-2xl border border-white/5 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.3)] focus-within:border-white/10 transition-all overflow-hidden"
             >
-              <textarea
+              <Textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -268,21 +249,27 @@ function Home() {
                   }
                 }}
                 placeholder="Message Cerebras..."
-                rows={1}
-                className="flex-1 bg-transparent border-none focus:ring-0 resize-none py-3 px-4 text-(--text-primary) placeholder-(--text-secondary) max-h-48"
-                style={{ height: "auto" }}
+                className="w-full min-h-[64px] py-5 pl-7 pr-16 bg-transparent border-none focus:ring-0 resize-none text-[16px] leading-[1.6] text-white/90 placeholder:text-white/30"
               />
-              <button
-                type="submit"
-                disabled={!input.trim() || isLoading}
-                className="p-3 aspect-square flex items-center justify-center"
-              >
-                <Send size={20} className={isLoading ? "animate-pulse" : ""} />
-              </button>
+              <div className="absolute right-3 bottom-3">
+                <Button
+                  type="submit"
+                  disabled={!input.trim() || isLoading}
+                  className={cn(
+                    "h-10 w-10 flex items-center justify-center rounded-2xl",
+                    !input.trim() || isLoading
+                      ? "bg-white/5 text-white/20 cursor-not-allowed"
+                      : "bg-white text-black"
+                  )}
+                >
+                  {isLoading ? (
+                    <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                  ) : (
+                    <ArrowUp size={22} strokeWidth={2.5} />
+                  )}
+                </Button>
+              </div>
             </form>
-            <p className="text-[10px] text-(--text-secondary) text-center mt-3 uppercase tracking-widest font-bold">
-              Powered by Cerebras SDK • Llama 3.3 70B
-            </p>
           </div>
         </div>
       </main>

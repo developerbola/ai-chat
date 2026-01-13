@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
-import { LogIn, UserPlus, Github, Sparkles } from "lucide-react";
+import { LogIn, UserPlus, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 export const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleAuth = async (e) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -29,7 +29,7 @@ export const Auth = () => {
         });
         if (error) throw error;
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
@@ -57,13 +57,13 @@ export const Auth = () => {
         const height = 600;
         const left = window.screenX + (window.outerWidth - width) / 2;
         const top = window.screenY + (window.outerHeight - height) / 2;
-        const popup = window.open(
+        window.open(
           data.url,
           "google-login",
           `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,status=yes`
         );
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);

@@ -1,4 +1,8 @@
-export const streamChat = async (messages, model, onChunk) => {
+export const streamChat = async (
+  messages: any[],
+  model: string,
+  onChunk: (chunk: string) => void
+) => {
   const backendURL = import.meta.env.VITE_API_URL;
   const response = await fetch(`${backendURL}/chat`, {
     method: "POST",
@@ -12,7 +16,9 @@ export const streamChat = async (messages, model, onChunk) => {
     throw new Error("Failed to connect to server");
   }
 
-  const reader = response.body.getReader();
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error("No reader available");
+
   const decoder = new TextDecoder();
   let done = false;
 
