@@ -170,7 +170,7 @@ function Home() {
           <div className="flex items-center gap-3">
             <Sparkles className="text-(--accent-blue)" size={20} />
             <span className="font-semibold text-lg">
-              Cerebras Chat Platform
+              Chat AI
             </span>
           </div>
           <div className="flex items-center gap-4">
