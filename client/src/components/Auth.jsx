@@ -53,7 +53,6 @@ export const Auth = () => {
       if (error) throw error;
 
       if (data?.url) {
-        // Open the Google login in a popup window
         const width = 500;
         const height = 600;
         const left = window.screenX + (window.outerWidth - width) / 2;
@@ -63,10 +62,6 @@ export const Auth = () => {
           "google-login",
           `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,status=yes`
         );
-
-        if (!popup) {
-          setError("Popup was blocked. Please enable popups for this site.");
-        }
       }
     } catch (err) {
       setError(err.message);
@@ -91,7 +86,7 @@ export const Auth = () => {
           </p>
         </div>
 
-        <div className="glass-card p-8 bg-(--bg-secondary)/50 border-(--glass-border)">
+        <div className="p-8 bg-(--bg-secondary)/50">
           <form onSubmit={handleAuth} className="space-y-6">
             {error && (
               <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
@@ -108,7 +103,7 @@ export const Auth = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-(--bg-accent)/50 border border-(--glass-border) rounded-xl px-4 py-3 text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-(--accent-blue)/50 transition-all"
+                className="w-full bg-(--bg-accent)/50 border rounded-xl px-4 py-3 text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-(--accent-blue)/50 transition-all"
                 placeholder="you@example.com"
               />
             </div>
@@ -122,7 +117,7 @@ export const Auth = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-(--bg-accent)/50 border border-(--glass-border) rounded-xl px-4 py-3 text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-(--accent-blue)/50 transition-all"
+                className="w-full bg-(--bg-accent)/50 border rounded-xl px-4 py-3 text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-(--accent-blue)/50 transition-all"
                 placeholder="••••••••"
               />
             </div>
@@ -130,7 +125,7 @@ export const Auth = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full primary-btn py-4 flex items-center justify-center gap-2 font-semibold"
+              className="w-full py-4 flex items-center justify-center gap-2 font-semibold"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -148,7 +143,7 @@ export const Auth = () => {
 
           <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-(--glass-border)"></div>
+              <div className="w-full border-t"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-(--bg-secondary) px-2 text-(--text-secondary)">
@@ -183,7 +178,7 @@ export const Auth = () => {
             Continue with Google
           </button>
 
-          <div className="mt-8 pt-8 border-t border-(--glass-border)">
+          <div className="mt-8 pt-8 border-t">
             <button
               onClick={() => setIsSignUp(!isSignUp)}
               className="w-full text-center text-sm text-(--text-secondary) hover:text-(--text-primary) transition-colors"

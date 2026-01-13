@@ -8,10 +8,10 @@ export const Sidebar = ({
   onDeleteChat,
 }) => {
   return (
-    <div className="w-72 h-screen bg-[var(--bg-secondary)] border-r border-[var(--glass-border)] flex flex-col p-4">
+    <div className="w-72 h-screen bg-[var(--bg-secondary)] flex flex-col p-4">
       <button
         onClick={onNewChat}
-        className="flex items-center justify-center gap-2 w-full glass-card py-3 mb-6 hover:bg-[var(--bg-accent)] transition-all group"
+        className="flex items-center justify-center gap-2 w-full py-3 mb-6 hover:bg-[var(--bg-accent)] transition-all group"
       >
         <Plus
           size={18}
@@ -28,7 +28,7 @@ export const Sidebar = ({
           <div
             key={chat.id}
             onClick={() => onSelectChat(chat.id)}
-            className={`sidebar-item group relative ${
+            className={`group relative ${
               activeChatId === chat.id ? "active" : ""
             }`}
           >
@@ -49,17 +49,12 @@ export const Sidebar = ({
         ))}
       </div>
 
-      <div className="mt-auto pt-4 border-t border-[var(--glass-border)] space-y-2">
-        <div className="sidebar-item">
+      <div className="mt-auto pt-4 border-t space-y-2">
+        <div>
           <Settings size={16} />
           <span>Settings</span>
         </div>
-        <a
-          href="https://github.com"
-          target="_blank"
-          rel="noreferrer"
-          className="sidebar-item"
-        >
+        <a href="https://github.com" target="_blank" rel="noreferrer">
           <Github size={16} />
           <span>Github</span>
         </a>

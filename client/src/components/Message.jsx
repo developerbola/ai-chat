@@ -21,7 +21,7 @@ export const Message = ({ role, content }) => {
       animate={{ opacity: 1, y: 0 }}
       className={`flex gap-4 p-6 ${
         role === "assistant"
-          ? "bg-(--glass-bg) border-y border-(--glass-border)"
+          ? "bg-red-400"
           : ""
       }`}
     >

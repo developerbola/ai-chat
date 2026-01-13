@@ -166,7 +166,7 @@ function Home() {
 
       <main className="flex-1 flex flex-col relative bg-(--bg-primary)">
         {/* Header */}
-        <header className="h-16 border-b border-(--glass-border) flex items-center justify-between px-8 bg-(--bg-primary)/80 backdrop-blur-md z-10">
+        <header className="h-16 border-b flex items-center justify-between px-8 bg-(--bg-primary)/80 backdrop-blur-md z-10">
           <div className="flex items-center gap-3">
             <Sparkles className="text-(--accent-blue)" size={20} />
             <span className="font-semibold text-lg">
@@ -174,13 +174,13 @@ function Home() {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-(--bg-accent) px-3 py-1.5 rounded-lg border border-(--glass-border) text-sm cursor-pointer hover:border-(--accent-blue) transition-all">
+            <div className="flex items-center gap-2 bg-(--bg-accent) px-3 py-1.5 rounded-lg border text-sm cursor-pointer hover:border-(--accent-blue) transition-all">
               <span className="text-(--text-secondary)">Model:</span>
               <span className="font-medium text-(--accent-blue)">{model}</span>
               <ChevronDown size={14} className="text-(--text-secondary)" />
             </div>
 
-            <div className="h-8 w-px bg-(--glass-border)" />
+            <div className="h-8 w-px" />
 
             <div className="flex items-center gap-3">
               <div className="flex flex-col items-end mr-1">
@@ -193,7 +193,7 @@ function Home() {
               </div>
               <button
                 onClick={handleSignOut}
-                className="p-2 rounded-lg bg-(--bg-accent) border border-(--glass-border) text-(--text-secondary) hover:text-red-400 hover:border-red-400/50 transition-all"
+                className="p-2 rounded-lg bg-(--bg-accent) border text-(--text-secondary) hover:text-red-400 hover:border-red-400/50 transition-all"
                 title="Sign Out"
               >
                 <LogOut size={18} />
@@ -231,7 +231,7 @@ function Home() {
                   <button
                     key={prompt}
                     onClick={() => setInput(prompt)}
-                    className="glass-card p-4 text-left hover:bg-(--bg-accent) hover:-translate-y-1 transition-all duration-300"
+                    className="p-4 text-left hover:bg-(--bg-accent) hover:-translate-y-1 transition-all duration-300"
                   >
                     <p className="text-sm font-medium">{prompt}</p>
                   </button>
@@ -256,7 +256,7 @@ function Home() {
             <div className="absolute -inset-1 bg-linear-to-r from-(--accent-blue) to-(--accent-purple) rounded-2xl opacity-20 group-focus-within:opacity-40 transition-opacity blur-sm" />
             <form
               onSubmit={handleSubmit}
-              className="relative glass-card bg-(--bg-secondary) flex items-end gap-2 p-2"
+              className="relative bg-(--bg-secondary) flex items-end gap-2 p-2"
             >
               <textarea
                 value={input}
@@ -275,7 +275,7 @@ function Home() {
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="primary-btn p-3 aspect-square flex items-center justify-center"
+                className="p-3 aspect-square flex items-center justify-center"
               >
                 <Send size={20} className={isLoading ? "animate-pulse" : ""} />
               </button>
