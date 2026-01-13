@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
 import { LogIn, UserPlus, Github, Sparkles } from "lucide-react";
-
+import { Link } from "react-router-dom";
 export const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -194,6 +194,10 @@ export const Auth = () => {
             </button>
           </div>
         </div>
+      </div>
+      <div className="absolute top-[95%] left-[83%] w-fit flex gap-3 opacity-60">
+        <Link to={"/privacy"}>Privacy Policy</Link>
+        <Link to={"/terms"}>Terms of usage</Link>
       </div>
     </div>
   );
