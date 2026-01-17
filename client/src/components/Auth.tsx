@@ -74,9 +74,6 @@ export const Auth = () => {
     <div className="min-h-screen bg-(--bg-primary) flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-linear-to-br from-(--accent-blue) to-(--accent-purple) rounded-3xl mb-6 shadow-2xl shadow-blue-500/20">
-            <Sparkles size={40} className="text-white" />
-          </div>
           <h1 className="text-4xl font-bold tracking-tight mb-2">
             Welcome to{" "}
             <span className="text-(--accent-blue)">Cerebras Chat</span>
@@ -190,7 +187,7 @@ export const Auth = () => {
           </div>
         </div>
       </div>
-      <div className="absolute top-[95%] left-[83%] w-fit flex gap-3 opacity-60">
+      <div className="absolute top-[96%] left-[85%] w-fit flex gap-3 opacity-40 *:text-xs">
         <Link to={"/privacy"}>Privacy Policy</Link>
         <Link to={"/terms"}>Terms of usage</Link>
       </div>
