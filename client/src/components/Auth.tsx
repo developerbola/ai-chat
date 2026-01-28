@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
-import { LogIn, UserPlus, Sparkles } from "lucide-react";
+import { LogIn, UserPlus } from "lucide-react";
 import { Link } from "react-router-dom";
 export const Auth = () => {
   const [loading, setLoading] = useState(false);
@@ -42,13 +42,6 @@ export const Auth = () => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: {
-          queryParams: {
-            access_type: "offline",
-            prompt: "consent",
-          },
-          redirectTo: "https://chatt-aii.vercel.app",
-        },
       });
       if (error) throw error;
 
@@ -60,7 +53,7 @@ export const Auth = () => {
         window.open(
           data.url,
           "google-login",
-          `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,status=yes`
+          `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,status=yes`,
         );
       }
     } catch (err: any) {

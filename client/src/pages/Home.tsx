@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Sidebar } from "../components/Sidebar";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
@@ -6,17 +7,19 @@ import { Message } from "../components/Message";
 import { Auth } from "../components/Auth";
 import { supabase } from "../lib/supabase";
 import { streamChat } from "../lib/api";
-import { LogOut, ArrowUp } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { ArrowUp } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 import { cn } from "../lib/utils";
 
 function Home() {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [session, setSession] = useState<any>(null);
   const [chats, setChats] = useState<any[]>([]);
-  const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const activeChatId = id;
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [model, setModel] = useState("llama-3.3-70b");
+  const model = "llama-3.3-70b";
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,7 +33,6 @@ function Home() {
       setSession(session);
       if (!session) {
         setChats([]);
-        setActiveChatId(null);
       }
     });
 
@@ -40,10 +42,10 @@ function Home() {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     setChats([]);
-    setActiveChatId(null);
+    navigate("/");
   };
 
-  const activeChat = chats.find((c) => c.id === activeChatId) || chats[0];
+  const activeChat = chats.find((c) => c.id === activeChatId);
 
   useEffect(() => {
     if (session) {
@@ -51,47 +53,38 @@ function Home() {
     }
   }, [chats, session]);
 
-  // Load chats for specific user when session changes
   useEffect(() => {
     if (session) {
       const saved = localStorage.getItem(`chats_${session.user.id}`);
       if (saved) {
         const parsed = JSON.parse(saved);
         setChats(parsed);
-        setActiveChatId(parsed[0]?.id);
-      } else {
-        const defaultChat = [{ id: "1", title: "New Chat", messages: [] }];
-        setChats(defaultChat);
-        setActiveChatId("1");
+        if (!id && parsed.length > 0) {
+          navigate(`/chat/${parsed[0].id}`, { replace: true });
+        }
       }
     }
-  }, [session]);
+  }, [session, id, navigate]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeChat?.messages]);
 
   const handleNewChat = () => {
-    const newChat = {
-      id: Date.now().toString(),
-      title: "New Chat",
-      messages: [],
-    };
-    setChats([newChat, ...chats]);
-    setActiveChatId(newChat.id);
+    navigate("/");
   };
 
-  const handleSelectChat = (id: string) => setActiveChatId(id);
+  const handleSelectChat = (id: string) => navigate(`/chat/${id}`);
 
   const handleDeleteChat = (id: string) => {
     const filtered = chats.filter((c) => c.id !== id);
-    if (filtered.length === 0) {
-      const defaultChat = { id: "1", title: "New Chat", messages: [] };
-      setChats([defaultChat]);
-      setActiveChatId("1");
-    } else {
-      setChats(filtered);
-      if (activeChatId === id) setActiveChatId(filtered[0].id);
+    setChats(filtered);
+    if (activeChatId === id) {
+      if (filtered.length > 0) {
+        navigate(`/chat/${filtered[0].id}`);
+      } else {
+        navigate("/");
+      }
     }
   };
 
@@ -104,16 +97,16 @@ function Home() {
     let updatedMessages: any[];
 
     if (!activeChat) {
-      const newChatId = Date.now().toString();
+      const newChatId = crypto.randomUUID();
       updatedMessages = [userMessage];
       const newChat = {
         id: newChatId,
-        title: input.slice(0, 30) + "...",
+        title: input.slice(0, 30) + (input.length > 30 ? "..." : ""),
         messages: updatedMessages,
       };
       setChats([newChat, ...chats]);
-      setActiveChatId(newChatId);
       currentChatId = newChatId;
+      navigate(`/chat/${newChatId}`, { replace: true });
     } else {
       currentChatId = activeChatId!;
       updatedMessages = [...activeChat.messages, userMessage];
@@ -128,8 +121,8 @@ function Home() {
                     ? input.slice(0, 30) + "..."
                     : c.title,
               }
-            : c
-        )
+            : c,
+        ),
       );
     }
 
@@ -145,8 +138,8 @@ function Home() {
         prev.map((c) =>
           c.id === currentChatId
             ? { ...c, messages: [...updatedMessages, assistantMessage] }
-            : c
-        )
+            : c,
+        ),
       );
 
       await streamChat(updatedMessages, model, (chunk) => {
@@ -161,8 +154,8 @@ function Home() {
                     { role: "assistant", content: assistantContent },
                   ],
                 }
-              : c
-          )
+              : c,
+          ),
         );
       });
     } catch (error) {
@@ -180,10 +173,12 @@ function Home() {
     <div className="flex h-screen overflow-hidden">
       <Sidebar
         chats={chats}
-        activeChatId={activeChatId}
+        activeChatId={activeChatId ?? null}
+        session={session}
         onNewChat={handleNewChat}
         onSelectChat={handleSelectChat}
         onDeleteChat={handleDeleteChat}
+        onSignOut={handleSignOut}
       />
 
       <main className="flex-1 flex flex-col relative">
@@ -191,30 +186,11 @@ function Home() {
           <div className="flex items-center gap-3">
             <span className="font-semibold text-lg">Chat AI</span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="flex flex-col items-end mr-1">
-                <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-tighter">
-                  Signed In As
-                </span>
-                <span className="text-xs font-medium text-primary">
-                  {session?.user?.user_metadata?.name}
-                </span>
-              </div>
-              <button
-                onClick={handleSignOut}
-                className="p-2 rounded-lg bg-accent border text-secondary hover:text-red-400 hover:border-red-400/50 transition-all"
-                title="Sign Out"
-              >
-                <LogOut size={18} />
-              </button>
-            </div>
-          </div>
         </header>
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto custom-scrollbar">
-          {activeChat?.messages.length === 0 ? (
+          {!activeChat || activeChat.messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center p-8 text-center">
               <h2 className="text-3xl font-medium mb-3 tracking-tight">
                 How can I help you today?
@@ -259,7 +235,7 @@ function Home() {
                     "h-10 w-10 flex items-center justify-center rounded-2xl",
                     !input.trim() || isLoading
                       ? "bg-white/5 text-white/20 cursor-not-allowed"
-                      : "bg-white text-black"
+                      : "bg-white text-black",
                   )}
                 >
                   {isLoading ? (
