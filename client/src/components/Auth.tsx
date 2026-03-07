@@ -2,6 +2,7 @@ import { useState } from "react";
 import { supabase } from "../lib/supabase";
 import { LogIn, UserPlus } from "lucide-react";
 import { Link } from "react-router-dom";
+
 export const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -42,23 +43,36 @@ export const Auth = () => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          skipBrowserRedirect: true,
+        },
       });
       if (error) throw error;
-
       if (data?.url) {
         const width = 500;
         const height = 600;
         const left = window.screenX + (window.outerWidth - width) / 2;
         const top = window.screenY + (window.outerHeight - height) / 2;
-        window.open(
+
+        const popup = window.open(
           data.url,
           "google-login",
           `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,status=yes`,
         );
+
+        const {
+          data: { subscription },
+        } = supabase.auth.onAuthStateChange((event, session) => {
+          if (event === "SIGNED_IN" && session) {
+            subscription.unsubscribe();
+            popup?.close();
+            setLoading(false);
+          }
+        });
       }
     } catch (err: any) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };
@@ -68,8 +82,7 @@ export const Auth = () => {
       <div className="max-w-md w-full">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold tracking-tight mb-2">
-            Welcome to{" "}
-            <span className="text-(--accent-blue)">Cerebras Chat</span>
+            Welcome
           </h1>
           <p className="text-(--text-secondary)">
             Sign in to access your personal AI assistant

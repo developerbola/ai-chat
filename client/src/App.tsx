@@ -11,6 +11,7 @@ const App = () => {
         <Route element={<Home />} path="/chat/:id" />
         <Route element={<Terms />} path="/terms" />
         <Route element={<Policy />} path="/policy" />
+        <Route element={<Policy />} path="/auth/callback" />
       </Routes>
     </div>
   );
