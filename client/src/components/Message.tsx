@@ -27,7 +27,7 @@ export const Message: React.FC<MessageProps> = ({ role, content }) => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`flex w-full mb-6 ${
+      className={`flex w-full mb-6 overflow-auto ${
         isAssistant ? "justify-start" : "justify-end"
       }`}
     >
