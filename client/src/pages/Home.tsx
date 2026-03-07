@@ -19,7 +19,7 @@ function Home() {
   const activeChatId = id;
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const model = "llama3.1-8b";
+  const model = "gpt-oss-120b";
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

@@ -23,7 +23,7 @@ app.post("/chat", async (c) => {
     try {
       const completion = await client.chat.completions.create({
         messages: messages,
-        model: model || "llama3.1-8b",
+        model: model || "gpt-oss-120b",
         stream: true,
       });
 
