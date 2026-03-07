@@ -23,7 +23,7 @@ app.post("/chat", async (c) => {
     try {
       const completion = await client.chat.completions.create({
         messages: messages,
-        model: model || "llama-3.3-70b",
+        model: model || "llama3.1-8b",
         stream: true,
       });
 
@@ -35,7 +35,7 @@ app.post("/chat", async (c) => {
       }
     } catch (error) {
       console.error("Streaming error:", error);
-      await stream.write("Error: Failed to generate response");
+      await stream.write(`Error: Failed to generate response: ${error}`);
     }
   });
 });

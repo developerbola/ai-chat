@@ -224,8 +224,8 @@ function Home() {
                     handleSubmit(e);
                   }
                 }}
-                placeholder="Message Cerebras..."
-                className="w-full min-h-[64px] py-5 pl-7 pr-16 bg-transparent border-none focus:ring-0 resize-none text-[16px] leading-[1.6] text-white/90 placeholder:text-white/30"
+                placeholder="Message ..."
+                className="w-full min-h-[64px] max-h-[500px] py-5 pl-7 pr-16 bg-transparent border-none focus:ring-0 resize-none text-[16px] leading-[1.6] text-white/90 placeholder:text-white/30"
               />
               <div className="absolute right-3 bottom-3">
                 <Button
