@@ -2,11 +2,18 @@ export const streamChat = async (
   messages: any[],
   onChunk: (chunk: string) => void,
 ) => {
+  const session = sessionStorage.getItem("user");
+  let token;
+  if (session) {
+    const user = JSON.parse(session) as { access_token?: string };
+    token = user.access_token;
+  }
   const backendURL = import.meta.env.VITE_API_URL;
   const response = await fetch(`${backendURL}/chat`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ messages, model: "gpt-oss-120b" }),
   });
