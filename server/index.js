@@ -5,7 +5,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 
 import { handle } from "hono/vercel";
-import Routes from "./routes/routes";
+import Routes from "./routes/routes.js";
 
 const app = new Hono().basePath("/api");
 
