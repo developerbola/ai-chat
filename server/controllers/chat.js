@@ -7,7 +7,6 @@ const client = new Cerebras({
 });
 
 export default async function chat(c) {
-  const user = c.get("user");
   const { messages, model, chat_id } = await c.req.json();
 
   if (!messages) {
@@ -29,6 +28,7 @@ export default async function chat(c) {
       messages,
       model: model || "gpt-oss-120b",
       stream: true,
+      reasoning_effort: "low",
     });
 
     for await (const chunk of completion) {

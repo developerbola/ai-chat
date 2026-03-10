@@ -1,20 +1,20 @@
 import supabase from "../../supabase/supabase.js";
 
-async function pinChat(c) {
-  const { chat_id } = await c.req.json();
+async function renameChat(c) {
+  const { title, chat_id } = await c.req.json();
   try {
     const { error } = await supabase
       .from("chats")
-      .update({ type: "pinned" })
+      .update({ title })
       .eq("chat_id", chat_id);
 
     if (error) {
       return c.json({ error });
     }
-    return c.json({ message: "Chat pinned", chat_id });
+    return c.json({ message: "Chat renamed", chat_id });
   } catch (err) {
     return c.json({ error: err.message });
   }
 }
 
-export default pinChat;
+export default renameChat;
