@@ -16,7 +16,7 @@ const App = () => {
           <Route element={<Auth />} path="/auth" />
           <Route element={<Home />} path="/chat/:id" />
           <Route element={<Terms />} path="/terms" />
-          <Route element={<Policy />} path="/policy" />
+          <Route element={<Policy />} path="/privacy" />
           <Route element={<AuthCallback />} path="/auth/callback" />
         </Routes>
       </SidebarProvider>
