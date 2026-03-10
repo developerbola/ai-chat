@@ -1,7 +1,6 @@
 export const streamChat = async (
   messages: any[],
-  model: string,
-  onChunk: (chunk: string) => void
+  onChunk: (chunk: string) => void,
 ) => {
   const backendURL = import.meta.env.VITE_API_URL;
   const response = await fetch(`${backendURL}/chat`, {
@@ -9,7 +8,7 @@ export const streamChat = async (
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ messages, model }),
+    body: JSON.stringify({ messages, model: "gpt-oss-120b" }),
   });
 
   if (!response.ok) {

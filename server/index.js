@@ -1,45 +1,18 @@
-import "dotenv/config";
+import { config } from "dotenv";
+config()
+
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { streamText } from "hono/streaming";
-import Cerebras from "@cerebras/cerebras_cloud_sdk";
-import { handle } from "hono/vercel";
 
-const app = new Hono();
-const client = new Cerebras({
-  apiKey: process.env["CEREBRAS_API_KEY"],
-});
+import { handle } from "hono/vercel";
+import Routes from "./routes/routes";
+
+const app = new Hono().basePath("/api");
 
 app.use("/*", cors());
+app.route("/", Routes);
 
-app.post("/chat", async (c) => {
-  const { messages, model } = await c.req.json();
-
-  if (!messages || !Array.isArray(messages)) {
-    return c.json({ error: "Messages array is required" }, 400);
-  }
-
-  return streamText(c, async (stream) => {
-    try {
-      const completion = await client.chat.completions.create({
-        messages: messages,
-        model: model || "gpt-oss-120b",
-        stream: true,
-      });
-
-      for await (const chunk of completion) {
-        const content = chunk.choices[0]?.delta?.content || "";
-        if (content) {
-          await stream.write(content);
-        }
-      }
-    } catch (error) {
-      console.error("Streaming error:", error);
-      await stream.write(`Error: Failed to generate response: ${error}`);
-    }
-  });
-});
-
+// export default app;
 const handler = handle(app);
 
 export const GET = handler;

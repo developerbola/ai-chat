@@ -1,10 +1,16 @@
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Loader2Icon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function AuthCallback() {
+  const navigate = useNavigate();
   useEffect(() => {
-    supabase.auth.getSession();
+    const signin = async () => {
+      await supabase.auth.getSession();
+      navigate("/");
+    };
+    signin();
   }, []);
 
   return (
