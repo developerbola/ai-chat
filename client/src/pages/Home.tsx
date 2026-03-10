@@ -111,7 +111,7 @@ function Home() {
         </div>
 
         {/* Input Area */}
-        <div className="w-full max-w-3xl mx-auto px-4 pb-6 pt-2">
+        <div className="w-full max-w-screen md:max-w-3xl mx-auto px-4 pb-6 pt-2">
           <div className="relative bg-secondary/40 backdrop-blur-2xl border border-white/5 rounded-3xl overflow-hidden transition-all focus-within:border-white/10">
             <form
               onSubmit={handleSubmit}
@@ -127,7 +127,7 @@ function Home() {
                   }
                 }}
                 placeholder="Type your message ..."
-                className="w-full min-h-[50px] max-h-[500px] bg-transparent! py-4 pl-6 pr-14 border-none resize-none text-white/90 placeholder:text-white/30 text-[16px] leading-[1.6] focus:ring-0 focus:outline-none"
+                className="w-full min-h-[50px] max-h-[300px] md:max-h-[500px] bg-transparent! py-4 pl-6 pr-14 border-none resize-none text-white/90 placeholder:text-white/30 text-[16px] leading-[1.6] focus:ring-0 focus:outline-none"
               />
 
               <Button
