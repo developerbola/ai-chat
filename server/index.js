@@ -9,10 +9,7 @@ import Routes from "./routes/routes.js";
 
 const app = new Hono().basePath("/api");
 
-app.use(
-  "/*",
-  cors({ origin: ["http://localhost:5173", "https://chatt-aii.vercel.app"] }),
-);
+app.use("/*", cors());
 app.route("/", Routes);
 
 // export default app;
