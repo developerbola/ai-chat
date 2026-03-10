@@ -6,10 +6,12 @@ import AuthCallback from "./pages/Callback";
 import { SidebarProvider } from "./components/ui/sidebar";
 import SessionProvider from "./providers/SessionProvider";
 import Auth from "./pages/Auth";
+import { Toaster } from "sonner";
 
 const App = () => {
   return (
     <SessionProvider>
+      <Toaster position="top-center" theme="dark" />
       <SidebarProvider>
         <Routes>
           <Route element={<Home />} path="/" />

@@ -14,6 +14,7 @@ import { api } from "@/lib/api";
 
 import ChatItem from "./ChatItem";
 import UserDialog from "./UserDialog";
+import { toast } from "sonner";
 
 export function AppSidebar() {
   const navigate = useNavigate();
@@ -52,7 +53,6 @@ export function AppSidebar() {
         console.error("Failed to fetch archived chats:", error);
       }
     } else {
-      // Return to normal chats when toggling off
       try {
         const history = await api("get", "/chats-history");
         setChats(history.data || []);
@@ -68,12 +68,32 @@ export function AppSidebar() {
       )
     : chats;
 
+  const handleDeleteChat = async (id: string) => {
+    const previous = chats;
+
+    setChats((prev) => prev.filter((c) => c.chat_id !== id));
+
+    try {
+      const promise = api("delete", "/delete-chat", { chat_id: id });
+
+      toast.promise(promise, {
+        loading: "Deleting...",
+        success: "Deleted",
+        error: "Delete failed",
+      });
+
+      await promise;
+    } catch {
+      setChats(previous);
+    }
+  };
+
   return (
-    <Sidebar className="border-r p-3 px-2">
+    <Sidebar className="border-r p-3 px-[3px]">
       <SidebarContent className="gap-0">
         <Button
           onClick={handleNewChat}
-          className="w-full justify-start gap-2 rounded-[8px] py-5 px-4 text-[14px]"
+          className="w-full justify-start gap-2 py-5 px-4 text-[14px]"
           variant="ghost"
         >
           <SquarePen size={16} />
@@ -81,7 +101,7 @@ export function AppSidebar() {
         </Button>
         <Button
           onClick={handleSearch}
-          className="w-full justify-start gap-2 rounded-[8px] py-5 px-4 text-[14px]"
+          className="w-full justify-start gap-2 py-5 px-4 text-[14px]"
           variant="ghost"
         >
           <Search size={16} />
@@ -89,7 +109,7 @@ export function AppSidebar() {
         </Button>
         <Button
           onClick={handleArchived}
-          className="w-full justify-start gap-2 rounded-[8px] py-5 px-4 text-[14px]"
+          className="w-full justify-start gap-2 py-5 px-4 text-[14px]"
           variant="ghost"
         >
           <Archive size={16} />
@@ -113,7 +133,11 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarMenu>
             {filteredChats.map((chat) => (
-              <ChatItem key={chat.chat_id} chat={chat} />
+              <ChatItem
+                key={chat.chat_id}
+                chat={chat}
+                handleDeleteChat={handleDeleteChat}
+              />
             ))}
           </SidebarMenu>
         </SidebarGroup>

@@ -11,38 +11,32 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "./ui/button";
 
-type ChatItemProps = {
-  chat_id?: string;
-  title?: string;
-};
-const ChatItem = ({ chat }: { chat: ChatItemProps }) => {
+interface ChatItemProps {
+  chat: {
+    chat_id?: string;
+    title?: string;
+  };
+  handleDeleteChat: (id: string) => void;
+}
+
+const ChatItem = ({ chat, handleDeleteChat }: ChatItemProps) => {
   const navigate = useNavigate();
   const { id: activeChatId } = useParams();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleSelectChat = (id: string | undefined) => navigate(`/chat/${id}`);
 
-  // const handleDeleteChat = (id: string) => {
-  //   const filtered = chats.filter((c) => c.id !== id);
-  //   setChats(filtered);
-  //   if (activeChatId === id) {
-  //     if (filtered.length > 0) {
-  //       navigate(`/chat/${filtered[0].id}`);
-  //     } else {
-  //       navigate("/");
-  //     }
-  //   }
-  // };
-
   return (
     <div
       onClick={() => handleSelectChat(chat.chat_id)}
       className={cn(
-        "group flex items-center h-9 pl-4 pr-2 py-0.5 rounded-sm cursor-pointer hover:bg-white/13 chat-history-item",
+        "group flex items-center h-9 pl-3 pr-2 rounded-sm cursor-pointer hover:bg-white/13 chat-history-item",
         activeChatId === chat.chat_id && "bg-white/10",
       )}
     >
-      <span className="truncate flex-1 text-ellipsis text-[13px]">{chat.title}</span>
+      <span className="truncate flex-1 text-ellipsis text-[14px]">
+        {chat.title}
+      </span>
 
       <DropdownMenu onOpenChange={(open) => setDropdownOpen(open)}>
         <DropdownMenuTrigger asChild>
@@ -88,7 +82,7 @@ const ChatItem = ({ chat }: { chat: ChatItemProps }) => {
           <DropdownMenuItem
             onClick={(e) => {
               e.stopPropagation();
-              //   handleDeleteChat(chat.chat_id);
+              handleDeleteChat(chat.chat_id as string);
             }}
             variant="destructive"
           >
