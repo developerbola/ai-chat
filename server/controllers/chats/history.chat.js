@@ -1,4 +1,4 @@
-import supabase from "../supabase/supabase.js";
+import supabase from "../../supabase/supabase.js";
 
 async function chatsHistory(c) {
   try {
@@ -43,4 +43,4 @@ async function chatsHistory(c) {
   }
 }
 
-export { chatsHistory };
+export default chatsHistory;

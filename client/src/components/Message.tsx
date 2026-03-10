@@ -4,7 +4,6 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { githubDarkTheme } from "../styles/syntax-theme";
 import { Copy, Check } from "lucide-react";
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 
 interface MessageProps {
@@ -24,10 +23,8 @@ export const Message: React.FC<MessageProps> = ({ role, content }) => {
   const isAssistant = role === "assistant";
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`flex w-full mb-6 overflow-auto ${
+    <div
+      className={`flex w-full mb-6 overflow-auto animate-fade-in ${
         isAssistant ? "justify-start" : "justify-end"
       }`}
     >
@@ -85,6 +82,6 @@ export const Message: React.FC<MessageProps> = ({ role, content }) => {
           {copied ? <Check size={12} /> : <Copy size={12} />}
         </Button>
       </div>
-    </motion.div>
+    </div>
   );
 };

@@ -4,15 +4,14 @@ const api_url = import.meta.env.VITE_API_URL;
 
 const api = async (
   method: string = "get",
-  data: any = {},
   path: string = "",
+  data: any = {},
   contentType: string = "application/json",
 ): Promise<AxiosResponse | any> => {
+  const userString = sessionStorage.getItem("user");
   try {
     if (!path?.includes("undefined")) {
       const url = `${api_url}${path}`;
-
-      const userString = sessionStorage.getItem("user");
 
       let token: string | undefined = undefined;
 
@@ -42,11 +41,15 @@ const api = async (
       }
 
       const response = await axios(config);
-      return response;
+      return response.data;
     }
   } catch (error: any) {
     if (error.response && error.response.status === 403) {
       sessionStorage.removeItem("user");
+    }
+    if (error.status == 401 && userString) {
+      sessionStorage.removeItem("user");
+      window.location.pathname = "/auth";
     }
     return error.response || error;
   }
