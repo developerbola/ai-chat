@@ -28,6 +28,7 @@ const ChatItem = ({ chat, handleDeleteChat, onChatUpdated }: ChatItemProps) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [newTitle, setNewTitle] = useState(chat.title || "");
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleSelectChat = (id: string | undefined) => navigate(`/chat/${id}`);
 
@@ -77,8 +78,10 @@ const ChatItem = ({ chat, handleDeleteChat, onChatUpdated }: ChatItemProps) => {
   return (
     <div
       onClick={() => handleSelectChat(chat.chat_id)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "group flex items-center h-9 pl-3 pr-2 rounded-sm cursor-pointer hover:bg-white/13 chat-history-item",
+        "flex items-center h-9 pl-3 pr-2 rounded-sm cursor-pointer hover:bg-white/13 chat-history-item",
         activeChatId === chat.chat_id && "bg-white/10",
       )}
     >
@@ -109,8 +112,8 @@ const ChatItem = ({ chat, handleDeleteChat, onChatUpdated }: ChatItemProps) => {
             variant="ghost"
             className={cn(
               "transition-opacity",
-              "opacity-0 group-hover:opacity-100",
-              dropdownOpen && "opacity-100",
+              "opacity-0",
+              (isHovered || dropdownOpen) && "opacity-100",
             )}
             onClick={(e) => e.stopPropagation()}
           >
