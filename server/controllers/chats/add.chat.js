@@ -8,14 +8,14 @@ async function addChat(c) {
     const { data, error } = await supabase
       .from("chats")
       .insert({
-        title,
+        title: title || "New Chat",
         user_id: user.id,
       })
       .select();
     if (error) {
       return c.json({ error: error.message }, 400);
     }
-    return c.json(data[0].chat_id);
+    return c.json({ chat_id: data[0].chat_id });
   } catch (err) {
     return c.json({ error: err.message }, 500);
   }

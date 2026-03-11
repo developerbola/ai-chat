@@ -1,22 +1,58 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { AppSidebar } from "../components/AppSidebar";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { Message } from "../components/Message";
 import { streamChat } from "../lib/stream";
-import { ArrowUp, Ellipsis } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { cn } from "../lib/utils";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 function Home() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<
     { role: "user" | "assistant"; content: string }[]
   >([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [chatId, setChatId] = useState<string | null>(id || null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef(messages);
+  const streamingMsgIndexRef = useRef<number>(-1);
+
+  // Sync chatId with route parameter
+  useEffect(() => {
+    setChatId(id || null);
+  }, [id]);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
+  // Load messages when chatId changes
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (chatId) {
+        try {
+          const response = await api("post", "/messages", { chat_id: chatId });
+          if (response.messages) {
+            setMessages(response.messages);
+          }
+        } catch (error) {
+          console.error("Failed to fetch messages:", error);
+          toast.error("Failed to load messages");
+        }
+      } else {
+        setMessages([]);
+      }
+    };
+    fetchMessages();
+  }, [chatId]);
 
   // useEffect(() => {
   //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -26,45 +62,69 @@ function Home() {
   //   navigate("/");
   // };
 
-  // const handleDeleteChat = async (chatId: string) => {
-  //   try {
-  //     await supabase.from("chats").delete().eq("chat_id", chatId);
-  //     navigate("/");
-  //   } catch (error) {
-  //     console.error("Failed to delete chat:", error);
-  //   }
-  // };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
 
+    // Create a new chat if we don't have a chatId
+    let currentChatId = chatId;
+    if (!currentChatId) {
+      try {
+        const response = await api("post", "/add-chat", {
+          title: trimmed.slice(0, 30) + (trimmed.length > 30 ? "..." : ""),
+        });
+        const newChatId = response.chat_id;
+        currentChatId = newChatId;
+        setChatId(newChatId);
+        navigate(`/chat/${newChatId}`, { replace: true });
+      } catch (error) {
+        console.error("Failed to create chat:", error);
+        toast.error("Failed to create chat");
+        return;
+      }
+    }
+
     const userMessage: { role: "user"; content: string } = {
       role: "user",
       content: trimmed,
     };
+
+    // Add user message first
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
-      const assistantMessage: { role: "assistant"; content: string } = {
-        role: "assistant",
-        content: "",
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-
-      await streamChat([...messages, userMessage], (chunk: string) => {
-        setMessages((prev) => {
-          const updated = [...prev];
-          updated[updated.length - 1] = {
-            role: "assistant",
-            content: updated[updated.length - 1].content + chunk,
-          };
-          return updated;
-        });
+      // Add assistant message and capture its index in a ref
+      setMessages((prev) => {
+        const idx = prev.length;
+        streamingMsgIndexRef.current = idx;
+        return [...prev, { role: "assistant", content: "" }];
       });
+
+      // Use the captured index in the stream callback
+      await streamChat(
+        [...messagesRef.current, userMessage],
+        currentChatId,
+        (chunk: string) => {
+          setMessages((prev) => {
+            const updated = [...prev];
+            const idx = streamingMsgIndexRef.current;
+            if (
+              idx >= 0 &&
+              idx < updated.length &&
+              updated[idx].role === "assistant"
+            ) {
+              updated[idx] = {
+                ...updated[idx],
+                content: updated[idx].content + chunk,
+              };
+            }
+            return updated;
+          });
+        },
+      );
     } catch (error) {
       console.error("Failed to send message:", error);
       setMessages((prev) => [
@@ -88,11 +148,6 @@ function Home() {
           <div className="flex items-center gap-3">
             <SidebarTrigger />
             <span className="font-semibold text-lg">Chat AI</span>
-          </div>
-          <div>
-            <Button variant={"ghost"} size={"icon-sm"}>
-              <Ellipsis />
-            </Button>
           </div>
         </header>
 

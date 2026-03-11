@@ -9,11 +9,11 @@ import {
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 
-interface ChatItemProps {
+interface PinnedChatItemProps {
   chat: {
     chat_id?: string;
     title?: string;
@@ -22,14 +22,19 @@ interface ChatItemProps {
   onChatUpdated?: () => void;
 }
 
-const ChatItem = ({ chat, handleDeleteChat, onChatUpdated }: ChatItemProps) => {
+const PinnedChatItem = ({
+  chat,
+  handleDeleteChat,
+  onChatUpdated,
+}: PinnedChatItemProps) => {
   const navigate = useNavigate();
   const { id: activeChatId } = useParams();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [newTitle, setNewTitle] = useState(chat.title || "");
 
-  const handleSelectChat = (id: string | undefined) => navigate(`/chat/${id}`);
+  const handleSelectChat = (id: string | undefined) =>
+    navigate(`/chat/${id}`);
 
   const handleRename = async (e: React.SyntheticEvent) => {
     e.stopPropagation();
@@ -48,16 +53,16 @@ const ChatItem = ({ chat, handleDeleteChat, onChatUpdated }: ChatItemProps) => {
     }
   };
 
-  const handlePin = async (e: React.MouseEvent) => {
+  const handleUnpin = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!chat.chat_id) return;
 
     try {
-      await api("post", "/pin-chat", { chat_id: chat.chat_id });
-      toast.success("Chat pinned");
+      await api("post", "/unpin-chat", { chat_id: chat.chat_id });
+      toast.success("Chat unpinned");
       if (onChatUpdated) onChatUpdated();
     } catch (error) {
-      toast.error("Failed to pin chat");
+      toast.error("Failed to unpin chat");
     }
   };
 
@@ -97,9 +102,12 @@ const ChatItem = ({ chat, handleDeleteChat, onChatUpdated }: ChatItemProps) => {
           onClick={(e) => e.stopPropagation()}
         />
       ) : (
-        <span className="truncate flex-1 text-ellipsis text-[14px]">
-          {chat.title}
-        </span>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <Pin size={14} className="text-white/60 shrink-0" />
+          <span className="truncate text-ellipsis text-[14px]">
+            {chat.title}
+          </span>
+        </div>
       )}
 
       <DropdownMenu onOpenChange={(open) => setDropdownOpen(open)}>
@@ -123,8 +131,8 @@ const ChatItem = ({ chat, handleDeleteChat, onChatUpdated }: ChatItemProps) => {
             <PenLine size={14} className="mr-2" /> Rename
           </DropdownMenuItem>
 
-          <DropdownMenuItem onClick={handlePin}>
-            <Pin size={14} className="mr-2" /> Pin
+          <DropdownMenuItem onClick={handleUnpin}>
+            <Pin size={14} className="mr-2" /> Unpin
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleArchive}>
@@ -145,4 +153,4 @@ const ChatItem = ({ chat, handleDeleteChat, onChatUpdated }: ChatItemProps) => {
   );
 };
 
-export default ChatItem;
+export default PinnedChatItem;

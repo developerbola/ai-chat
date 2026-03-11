@@ -1,5 +1,6 @@
 export const streamChat = async (
   messages: any[],
+  chat_id: string | null,
   onChunk: (chunk: string) => void,
 ) => {
   const session = sessionStorage.getItem("user");
@@ -15,7 +16,7 @@ export const streamChat = async (
       "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`,
     },
-    body: JSON.stringify({ messages, model: "gpt-oss-120b" }),
+    body: JSON.stringify({ messages, model: "gpt-oss-120b", chat_id }),
   });
 
   if (!response.ok) {

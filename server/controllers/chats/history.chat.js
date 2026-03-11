@@ -18,7 +18,8 @@ async function chatsHistory(c) {
       .from("chats")
       .select(
         `chat_id,
-         title
+         title,
+         type
         `,
         { count: "exact" },
       )

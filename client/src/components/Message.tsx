@@ -1,10 +1,13 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { githubDarkTheme } from "../styles/syntax-theme";
+import remarkBreaks from "remark-breaks";
+import rehypeRaw from "rehype-raw";
+import rehypeHighlight from "rehype-highlight";
+
 import { Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { MDXComponents } from "./MDXComponents";
 
 interface MessageProps {
   role: "user" | "assistant";
@@ -39,30 +42,9 @@ export const Message: React.FC<MessageProps> = ({ role, content }) => {
           }`}
         >
           <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              code({ node, className, children, ...props }: any) {
-                const match = /language-(\w+)/.exec(className || "");
-                const isInline = !match;
-                return !isInline ? (
-                  <SyntaxHighlighter
-                    style={githubDarkTheme as any}
-                    language={match[1]}
-                    PreTag="div"
-                    {...props}
-                  >
-                    {String(children).replace(/\n$/, "")}
-                  </SyntaxHighlighter>
-                ) : (
-                  <code
-                    className={`${className} bg-black/20 px-1.5 py-0.5 rounded text-sm`}
-                    {...props}
-                  >
-                    {children}
-                  </code>
-                );
-              },
-            }}
+            remarkPlugins={[remarkGfm, remarkBreaks]}
+            rehypePlugins={[rehypeRaw, rehypeHighlight]}
+            components={MDXComponents}
           >
             {content}
           </ReactMarkdown>

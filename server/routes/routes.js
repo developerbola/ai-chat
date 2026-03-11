@@ -9,6 +9,8 @@ import pinChat from "../controllers/chats/pin.chat.js";
 import archiveChat from "../controllers/chats/archive.chat.js";
 import renameChat from "../controllers/chats/rename.chat.js";
 import deleteChat from "../controllers/chats/delete.chat.js";
+import unpinChat from "../controllers/chats/unpin.chat.js";
+import messages from "../controllers/messages.js";
 
 const routes = new Hono();
 
@@ -19,7 +21,9 @@ routes.post("/add-chat", authMiddleware, addChat);
 routes.post("/rename-chat", authMiddleware, renameChat);
 routes.delete("/delete-chat", authMiddleware, deleteChat);
 routes.post("/pin-chat", authMiddleware, pinChat);
+routes.post("/unpin-chat", authMiddleware, unpinChat);
 routes.post("/archive-chat", authMiddleware, archiveChat);
+routes.post("/messages", authMiddleware, messages);
 
 
 routes.get("*", (c) => {

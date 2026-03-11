@@ -8,9 +8,26 @@ const client = new Cerebras({
 
 export default async function chat(c) {
   const { messages, model, chat_id } = await c.req.json();
+  const user = c.get("user");
 
   if (!messages) {
     return c.json({ error: "Messages required" }, 400);
+  }
+
+  if (!chat_id) {
+    return c.json({ error: "Chat ID required" }, 400);
+  }
+
+  // Verify the chat belongs to the user
+  const { data: chat, error: chatError } = await supabase
+    .from("chats")
+    .select("chat_id")
+    .eq("chat_id", chat_id)
+    .eq("user_id", user.id)
+    .single();
+
+  if (chatError || !chat) {
+    return c.json({ error: "Chat not found or access denied" }, 404);
   }
 
   const userMessage = messages[messages.length - 1].content;

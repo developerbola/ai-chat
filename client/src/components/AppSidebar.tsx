@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { SquarePen, Search, Archive } from "lucide-react";
+import { SquarePen, Search, Archive, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
@@ -13,14 +13,20 @@ import {
 import { api } from "@/lib/api";
 
 import ChatItem from "./ChatItem";
+import PinnedChatItem from "./PinnedChatItem";
 import UserDialog from "./UserDialog";
 import { toast } from "sonner";
 
 export function AppSidebar() {
   const navigate = useNavigate();
-  const [chats, setChats] = useState<{ chat_id?: string; title?: string }[]>(
-    [],
-  );
+  const [chats, setChats] = useState<
+    {
+      chat_id?: string;
+      title?: string;
+      type: "normal" | "pinned" | "archived";
+    }[]
+  >([]);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
@@ -45,28 +51,8 @@ export function AppSidebar() {
   const handleArchived = async () => {
     setShowArchived((prev) => !prev);
     setShowSearch(false);
-    if (!showArchived) {
-      try {
-        const archived = await api("get", "/chats-history?archived=true");
-        setChats(archived.data || []);
-      } catch (error) {
-        console.error("Failed to fetch archived chats:", error);
-      }
-    } else {
-      try {
-        const history = await api("get", "/chats-history");
-        setChats(history.data || []);
-      } catch (error) {
-        console.error("Failed to fetch chats:", error);
-      }
-    }
+    await refreshChats();
   };
-
-  const filteredChats = searchQuery
-    ? chats.filter((chat) =>
-        chat.title?.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-    : chats;
 
   const handleDeleteChat = async (id: string) => {
     const previous = chats;
@@ -87,6 +73,26 @@ export function AppSidebar() {
       setChats(previous);
     }
   };
+
+  const refreshChats = async () => {
+    try {
+      const history = await api("get", "/chats-history");
+      setChats(history.data || []);
+    } catch (error) {
+      console.error("Failed to fetch chats:", error);
+    }
+  };
+
+  // Separate pinned and regular chats
+  const pinnedChats = chats.filter((chat) => chat.type === "pinned");
+  const archivedChats = chats.filter((chat) => chat.type === "archived");
+  const regularChats = chats.filter((chat) => chat.type == "normal");
+
+  // const filteredChats = searchQuery
+  //   ? regularChats.filter((chat) =>
+  //       chat.title?.toLowerCase().includes(searchQuery.toLowerCase()),
+  //     )
+  //   : regularChats;
 
   return (
     <Sidebar className="border-r p-3 px-[3px]">
@@ -112,7 +118,7 @@ export function AppSidebar() {
           className="w-full justify-start gap-2 py-5 px-4 text-[14px]"
           variant="ghost"
         >
-          <Archive size={16} />
+          {showArchived ? <ArrowLeft size={16} /> : <Archive size={16} />}
           {showArchived ? "Back to chats" : "Archived chats"}
         </Button>
 
@@ -127,20 +133,51 @@ export function AppSidebar() {
           />
         )}
 
-        <SidebarGroup>
-          <SidebarGroupLabel>
-            {showArchived ? "Archived Chats" : "Recent Chats"}
-          </SidebarGroupLabel>
-          <SidebarMenu>
-            {filteredChats.map((chat) => (
-              <ChatItem
-                key={chat.chat_id}
-                chat={chat}
-                handleDeleteChat={handleDeleteChat}
-              />
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
+        {pinnedChats.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Pinned Chats</SidebarGroupLabel>
+            <SidebarMenu>
+              {pinnedChats.map((chat) => (
+                <PinnedChatItem
+                  key={chat.chat_id}
+                  chat={chat}
+                  handleDeleteChat={handleDeleteChat}
+                  onChatUpdated={refreshChats}
+                />
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
+
+        {!showArchived ? (
+          <SidebarGroup>
+            <SidebarGroupLabel>Archived Chats</SidebarGroupLabel>
+            <SidebarMenu>
+              {archivedChats.map((chat) => (
+                <ChatItem
+                  key={chat.chat_id}
+                  chat={chat}
+                  handleDeleteChat={handleDeleteChat}
+                  onChatUpdated={refreshChats}
+                />
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        ) : (
+          <SidebarGroup>
+            <SidebarGroupLabel>Recent Chats</SidebarGroupLabel>
+            <SidebarMenu>
+              {regularChats.map((chat) => (
+                <ChatItem
+                  key={chat.chat_id}
+                  chat={chat}
+                  handleDeleteChat={handleDeleteChat}
+                  onChatUpdated={refreshChats}
+                />
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="bg-white/5 hover:bg-white/8 rounded-sm cursor-pointer">
