@@ -18,11 +18,9 @@ function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-
+  // useEffect(() => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // }, [messages]);
 
   // const handleNewChat = () => {
   //   navigate("/");
@@ -42,13 +40,19 @@ function Home() {
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
 
-    const userMessage = { role: "user", content: trimmed };
+    const userMessage: { role: "user"; content: string } = {
+      role: "user",
+      content: trimmed,
+    };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
-      const assistantMessage = { role: "assistant", content: "" };
+      const assistantMessage: { role: "assistant"; content: string } = {
+        role: "assistant",
+        content: "",
+      };
       setMessages((prev) => [...prev, assistantMessage]);
 
       await streamChat([...messages, userMessage], (chunk: string) => {
