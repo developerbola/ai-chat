@@ -13,7 +13,7 @@ jobs:
       - name: Ping Supabase
         run: |
           curl -X GET \
-            "https://dyflmrrsepsnhwonbpdh.supabase.co/rest/v1/chats?select=id&limit=1" \
+            "https://dyflmrrsepsnhwonbpdh.supabase.co/rest/v1/chats?select=chat_id&limit=1" \
             -H "apikey: sb_publishable_DQv8ivnGuM9G7jZci8qDIQ_tAJowx2B" \
             -H "Authorization: Bearer sb_publishable_DQv8ivnGuM9G7jZci8qDIQ_tAJowx2B" \
             -H "Content-Type: application/json"
